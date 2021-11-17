@@ -2,7 +2,7 @@ var { Note } = Tonal;
 
 var Instruments = [
   {
-    name: "Bass Guitar (4-string)",
+    name: "Bass (4-string)",
     frets: 24,
     tunings: [{
       name: "Standard",
@@ -13,7 +13,7 @@ var Instruments = [
     }]
   },
   {
-    name: "Bass Guitar (5-string)",
+    name: "Bass (5-string)",
     frets: 24,
     tunings: [{
       name: "Standard",
@@ -21,7 +21,7 @@ var Instruments = [
     }]
   },
   {
-    name: "Bass Guitar (6-string)",
+    name: "Bass (6-string)",
     frets: 24,
     tunings: [{
       name: "Standard",
@@ -63,8 +63,25 @@ function startFretboard(){
   populateInstruments();
   populateTunings();
 
-  $('#root').on('change', drawFretboard);
-  $('#mode').on('change', drawFretboard);
+  $('#instrument')
+    .on('change', (ev) => { localStorage.setItem('instrument', $(ev.currentTarget).val()); })
+    .val(localStorage.getItem('instrument') || '0');
+  $('#tuning')
+    .on('change', (ev) => { localStorage.setItem('tuning', $(ev.currentTarget).val()); })
+    .val(localStorage.getItem('tuning') || '0');
+
+  $('#root')
+    .on('change', (el) => {
+      localStorage.setItem('root', $(el.currentTarget).val());
+      drawFretboard();
+    })
+    .val(localStorage.getItem('root') || 'C');
+  $('#mode')
+    .on('change', (el) => {
+      localStorage.setItem('mode', $(el.currentTarget).val());
+      drawFretboard();
+    })
+    .val(localStorage.getItem('mode') || 'Ionian');
 
   drawFretboard();
 }
@@ -72,10 +89,14 @@ function startFretboard(){
 function populateInstruments() {
   let select = $('#instrument');
   select.find('option').remove();
-  select.on('change', () => { populateTunings(); drawFretboard() } );
+  select.on('change', () => {
+    populateTunings();
+    $('#tuning').change();
+  } );
 
   for (let idx in Instruments) {
-    select.append("<option value='"+idx+"'>"+Instruments[idx].name+"</option>")
+    let instrument = Instruments[idx];
+    select.append("<option value='"+idx+"'>"+instrument.name+"</option>")
   }
 }
 
@@ -136,7 +157,9 @@ function drawFretboard() {
 
     ctx.lineWidth = Style.fret.width;
     if ( fret > 1 && ((fret - 1) % 12) === 10 ) {
-      ctx.lineWidth = Style.fret.width * 1.5;
+      ctx.strokeStyle = Style.nut.color;
+    } else {
+      ctx.strokeStyle = Style.fret.color;
     }
 
     x += fretSpacing;
@@ -149,7 +172,7 @@ function drawFretboard() {
   const scaleChromas = scale.notes.map(n => Tonal.Note.chroma(n));
   let y = topMargin + (Style.string.width / 2) + 0.5;
   ctx.textAlign = 'center';
-  for (let [index, _string] of strings.reverse().entries()) {
+  for (let idx = 0; idx < strings.length; ++idx) {
     ctx.strokeStyle = Style.string.color;
     ctx.lineWidth = Style.string.width;
     ctx.beginPath();
@@ -158,16 +181,16 @@ function drawFretboard() {
     ctx.stroke();
 
     // markers
-    let note = Tonal.Note.get(tuning.strings[index]);
+    let string = strings[strings.length - 1 - idx];
+    let note = Tonal.Note.get(string);
     let x = leftMargin + Style.nut.width + 1;
     const markerRadius = markerSize / 2
     for (let fret = 0; fret <= instrument.frets; fret++) {
       if ((scaleChroma = scaleChromas.indexOf(note.chroma)) > -1) {
-        // let interval = scale.intervals[scaleChroma];
         let scaleNote = scale.notes[scaleChroma];
 
         let mx = parseInt(x)-markerSize-0.5;
-        if (fret === 1) { mx -= leftMargin }
+        // if (fret === 1) { mx -= leftMargin }
 
 ctx.strokeStyle = 'black';
 ctx.fillStyle = 'white';
