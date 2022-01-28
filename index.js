@@ -57,6 +57,15 @@ var Style = {
     labels: [3, 5, 7, 9, 12],
     font: '24px sans-serif',
   },
+  intervals: [
+    { shape: 'square', bg: '#444',  fg: 'white' },
+    {},
+    {},
+    { shape: 'circle', bg: '#666',  fg: 'white' },
+    { shape: 'circle', bg: '#444',  fg: 'white' },
+    {},
+    {}
+  ]
 }
 
 function startFretboard(){
@@ -128,7 +137,7 @@ function drawFretboard() {
   const fretWidth = (canvasWidth - (Style.fret.width * instrument.frets)) / (instrument.frets + 1);
   const fretSpacing = fretWidth + Style.fret.width;
   const fretHeight = (strings.length * Style.string.width) + ((strings.length-1) * Style.string.spacing);
-  const markerSize = fretWidth / 2;
+  const markerSize = fretWidth * 0.6;
 
   const leftMargin = markerSize + ((fretWidth - markerSize) / 2);
   const topMargin = markerSize / 2;
@@ -181,38 +190,60 @@ function drawFretboard() {
     ctx.stroke();
 
     // markers
-    let string = strings[strings.length - 1 - idx];
+    const string = strings[strings.length - 1 - idx];
     let note = Tonal.Note.get(string);
     let x = leftMargin + Style.nut.width + 1;
-    const markerRadius = markerSize / 2
-    for (let fret = 0; fret <= instrument.frets; fret++) {
-      if ((scaleChroma = scaleChromas.indexOf(note.chroma)) > -1) {
-        let scaleNote = scale.notes[scaleChroma];
+    const markerRadius = markerSize / 2;
+    for ( let fret = 0; fret <= instrument.frets; fret++,
+          x += fretSpacing,
+          note = Tonal.Note.get(Tonal.Note.fromMidi(note.midi + 1))
+        ) {
+      const chroma = scaleChromas.indexOf(note.chroma)
+      if (chroma === -1) { continue }
 
-        let mx = parseInt(x)-markerSize-0.5;
-        // if (fret === 1) { mx -= leftMargin }
+      const scaleNote = scale.notes[chroma];
+      const mx = parseInt(x) - (fretSpacing / 2) - 0.5;
+      const style = Style.intervals[chroma];
 
-ctx.strokeStyle = 'black';
-ctx.fillStyle = 'white';
-ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(mx + markerRadius, y);
-        ctx.arc(mx, y, markerRadius, 0, Math.PI*2, 1);
-        ctx.fill();
-        ctx.stroke();
+      switch (style.shape) {
+        case 'square':
+          ctx.beginPath();
+          ctx.moveTo(mx - markerRadius, y - markerRadius);
+          ctx.lineTo(mx + markerRadius, y - markerRadius);
+          ctx.lineTo(mx + markerRadius, y + markerRadius);
+          ctx.lineTo(mx - markerRadius, y + markerRadius);
+          ctx.closePath();
+          break;
 
-        ctx.fillStyle = 'black';
-        ctx.font = 'small-caps bold 24px sans-serif';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText((scaleChroma+1) + '', mx, y + (markerRadius / 2) ); //, 10 );
+        case 'pentagon':
+          break;
 
-        ctx.font = '13px sans-serif';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(scaleNote + '', mx, y + markerRadius);
+        case 'hexagon':
+          break;
+
+        case 'circle':
+        default:
+          ctx.beginPath();
+          ctx.moveTo(mx + markerRadius, y);
+          ctx.arc(mx, y, markerRadius, 0, Math.PI * 2, 1);
+          break;
       }
 
-      x += fretSpacing;
-      note = Tonal.Note.get(Tonal.Note.fromMidi(note.midi + 1));
+      ctx.fillStyle = style.bg || 'white';
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+
+      ctx.fillStyle = style.fg || 'black';
+      ctx.font = 'small-caps bold 24px sans-serif';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText((chroma+1) + '', mx, y + (markerRadius / 3) );
+
+      ctx.font = '13px sans-serif';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(scaleNote + '', mx, y + (markerRadius / 1.2));
+
     }
 
     y += Style.string.width + Style.string.spacing;
