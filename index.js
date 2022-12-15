@@ -1,4 +1,4 @@
-var { Note } = Tonal;
+const { Note } = Tonal;
 
 var Instruments = [
   {
@@ -49,6 +49,14 @@ var Instruments = [
     }, {
       name: "Drop D",
       strings: ['D2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+    }]
+  },
+  {
+    name: "Guitar (7-string)",
+    frets: 22,
+    tunings: [{
+      name: "Standard (E)",
+      strings: ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
     }]
   },
 ]
