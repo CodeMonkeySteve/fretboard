@@ -32,20 +32,23 @@ const Instruments = [
     name: "Bass (4-string)",
     frets: 24,
     tunings: [{
-      name: "Standard (E)",
+      name: "E Standard",
       strings: ['E1', 'A1', 'D2', 'G2'],
     }, {
-      name: "Eb",
+      name: "E♭ Standard",
       strings: ['Eb1', 'Ab1', 'Db2', 'Gb2'],
+    }, {
+      name: "D Standard",
+      strings: ['D1', 'G1', 'C2', 'F2'],
+    }, {
+      name: "C♯ Standard",
+      strings: ['C#1', 'F#1', 'B1', 'E2'],
     }, {
       name: "Drop D",
       strings: ['D1', 'A1', 'D2', 'G2'],
     }, {
-      name: "Drop C#",
+      name: "Drop C♯",
       strings: ['C#1', 'G#1', 'C#2', 'F#2'],
-    }, {
-      name: "C#",
-      strings: ['C#1', 'F#1', 'B1', 'E2'],
     }, {
       name: "Drop C",
       strings: ['C1', 'G1', 'C2', 'F2'],
@@ -55,15 +58,18 @@ const Instruments = [
     name: "Bass (5-string)",
     frets: 24,
     tunings: [{
-      name: "Standard (E)",
+      name: "B Standard",
       strings: ['B0', 'E1', 'A1', 'D2', 'G2'],
+    }, {
+      name: "Drop A",
+      strings: ['A0', 'E1', 'A1', 'D2', 'G2'],
     }]
   },
   {
     name: "Bass (6-string)",
     frets: 24,
     tunings: [{
-      name: "Standard (E)",
+      name: "B Standard",
       strings: ['B0', 'E1', 'A1', 'D2', 'G2', 'C3'],
     }]
   },
@@ -71,7 +77,7 @@ const Instruments = [
     name: "Guitar (6-string)",
     frets: 22,
     tunings: [{
-      name: "Standard (E)",
+      name: "E Standard",
       strings: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
     }, {
       name: "Drop D",
@@ -82,7 +88,7 @@ const Instruments = [
     name: "Guitar (7-string)",
     frets: 22,
     tunings: [{
-      name: "Standard (E)",
+      name: "B Standard",
       strings: ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
     }]
   },
