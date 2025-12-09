@@ -234,13 +234,6 @@ function drawFretboard() {
           ctx.lineTo(mx - markerRadius, y + markerRadius);
           ctx.closePath();
           break;
-
-        case 'pentagon':
-          break;
-
-        case 'hexagon':
-          break;
-
         case 'circle':
         default:
           ctx.beginPath();
