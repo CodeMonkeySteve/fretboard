@@ -17,12 +17,12 @@ const Style = {
     font: '24px sans-serif',
   },
   intervals: [
-    { shape: 'square', bg: '#444',  fg: 'white' },
+    { shape: 'square',  bg: '#444',  fg: 'white' },
     {},
-    {},
-    { shape: 'circle', bg: '#666',  fg: 'white' },
-    { shape: 'circle', bg: '#444',  fg: 'white' },
-    {},
+    { shape: 'hexagon' },
+    { shape: 'circle',  bg: '#666',  fg: 'white' },
+    { shape: 'circle',  bg: '#444',  fg: 'white' },
+    { shape: 'hexagon', bg: '#666',  fg: 'white' },
     {}
   ]
 }
@@ -257,22 +257,35 @@ function drawFretboard() {
       const mx = parseInt(x) - (fretSpacing / 2) - 0.5;
       const style = Style.intervals[chroma];
 
+      ctx.translate(mx, y);
+      ctx.beginPath()
       switch (style.shape) {
         case 'square':
-          ctx.beginPath();
-          ctx.moveTo(mx - markerRadius, y - markerRadius);
-          ctx.lineTo(mx + markerRadius, y - markerRadius);
-          ctx.lineTo(mx + markerRadius, y + markerRadius);
-          ctx.lineTo(mx - markerRadius, y + markerRadius);
-          ctx.closePath();
+          ctx.moveTo(-markerRadius, -markerRadius)
+          ctx.lineTo(+markerRadius, -markerRadius)
+          ctx.lineTo(+markerRadius, +markerRadius)
+          ctx.lineTo(-markerRadius, +markerRadius)
+          ctx.closePath()
+          break;
+        case 'hexagon':
+          const sides = 6
+          for (let i = 0; i < sides; i++) {
+            const rotation = ((Math.PI * 2) / sides) * i
+            const radius = markerRadius * (2 / Math.sqrt(3))
+            if ( i === 0 ) {
+              ctx.moveTo(radius * Math.cos(rotation), radius * Math.sin(rotation));
+            } else {
+              ctx.lineTo(radius * Math.cos(rotation), radius * Math.sin(rotation));
+            }
+          }
           break;
         case 'circle':
         default:
-          ctx.beginPath();
-          ctx.moveTo(mx + markerRadius, y);
-          ctx.arc(mx, y, markerRadius, 0, Math.PI * 2, 1);
-          break;
+          ctx.moveTo(markerRadius, 0)
+          ctx.arc(0, 0, markerRadius, 0, Math.PI * 2, 1)
+          break
       }
+      ctx.closePath()
 
       ctx.fillStyle = style.bg || 'white';
       ctx.fill();
@@ -283,12 +296,13 @@ function drawFretboard() {
       ctx.fillStyle = style.fg || 'black';
       ctx.font = 'small-caps bold 24px sans-serif';
       ctx.textBaseline = 'bottom';
-      ctx.fillText((chroma+1) + '', mx, y + (markerRadius / 3) );
+      ctx.fillText((chroma+1) + '', 0, (markerRadius / 3) + 2);
 
       ctx.font = '13px sans-serif';
       ctx.textBaseline = 'bottom';
-      ctx.fillText(scaleNote + '', mx, y + (markerRadius / 1.2));
+      ctx.fillText(scaleNote + '', 0, (markerRadius / 1.2) + 2);
 
+      ctx.resetTransform();
     }
 
     y += Style.string.width + Style.string.spacing;
