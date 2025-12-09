@@ -1,6 +1,33 @@
 const { Note } = Tonal;
 
-var Instruments = [
+const Style = {
+  nut: {
+    width: 5,
+    color: '#000',
+  },
+  string: {
+    width: 10,
+    spacing: 64,
+    color: '#888',
+  },
+  fret: {
+    width: 3,
+    color: '#888',
+    labels: [3, 5, 7, 9, 12],
+    font: '24px sans-serif',
+  },
+  intervals: [
+    { shape: 'square', bg: '#444',  fg: 'white' },
+    {},
+    {},
+    { shape: 'circle', bg: '#666',  fg: 'white' },
+    { shape: 'circle', bg: '#444',  fg: 'white' },
+    {},
+    {}
+  ]
+}
+
+const Instruments = [
   {
     name: "Bass (4-string)",
     frets: 24,
@@ -61,43 +88,14 @@ var Instruments = [
   },
 ]
 
-var Style = {
-  nut: {
-    width: 5,
-    color: '#000',
-  },
-  string: {
-    width: 10,
-    spacing: 64,
-    color: '#888',
-  },
-  fret: {
-    width: 3,
-    color: '#888',
-    labels: [3, 5, 7, 9, 12],
-    font: '24px sans-serif',
-  },
-  intervals: [
-    { shape: 'square', bg: '#444',  fg: 'white' },
-    {},
-    {},
-    { shape: 'circle', bg: '#666',  fg: 'white' },
-    { shape: 'circle', bg: '#444',  fg: 'white' },
-    {},
-    {}
-  ]
+function shuffleArray(arr) {
+  return arr.map(a => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map(a => a[1])
 }
 
+shuffleList = []
 function startFretboard(){
   populateInstruments();
   populateTunings();
-
-  $('#instrument')
-    .on('change', (ev) => { localStorage.setItem('instrument', $(ev.currentTarget).val()); })
-    .val(localStorage.getItem('instrument') || '0');
-  $('#tuning')
-    .on('change', (ev) => { localStorage.setItem('tuning', $(ev.currentTarget).val()); })
-    .val(localStorage.getItem('tuning') || '0');
 
   $('#root')
     .on('change', (el) => {
@@ -111,6 +109,35 @@ function startFretboard(){
       drawFretboard();
     })
     .val(localStorage.getItem('mode') || 'Ionian');
+
+  $('#instrument')
+    .on('change', (ev) => { localStorage.setItem('instrument', $(ev.currentTarget).val()); })
+    .val(localStorage.getItem('instrument') || '0');
+  $('#tuning')
+    .on('change', (ev) => { localStorage.setItem('tuning', $(ev.currentTarget).val()); })
+    .val(localStorage.getItem('tuning') || '0');
+
+  let shuffleList = []
+  $('#shuffle').on('click', (ev) => {
+    const root = $('#root')
+    const btn = $(ev.currentTarget)
+
+    if ( shuffleList.length === 0 ) {
+      const curVal = root.val()
+      shuffleList = shuffleArray(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']).filter(el => el !== curVal)
+      shuffleList.push(curVal);
+    }
+
+    root.val(shuffleList.shift()).trigger('change')
+
+    if ( shuffleList.length > 1 ) {
+      btn.text("Next")
+    } else if ( shuffleList.length === 1 ) {
+      btn.text("Finish")
+    } else if ( shuffleList.length === 0 ) {
+      btn.text("Shuffle")
+    }
+  })
 
   drawFretboard();
 }
@@ -151,7 +178,6 @@ function drawFretboard() {
   const canvasWidth = parent.innerWidth();
   canvas = canvas.get(0);
   canvas.width = canvasWidth;
-  canvas.height = parent.height();
   let ctx = canvas.getContext('2d');
 
   const fretWidth = (canvasWidth - (Style.fret.width * instrument.frets)) / (instrument.frets + 1);
